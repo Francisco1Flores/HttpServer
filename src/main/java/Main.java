@@ -8,34 +8,34 @@ import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
-    System.out.println("Logs from your program will appear here!");
+    // You can use print statements as follows for debugging, they'll be visible when running tests
+      System.out.println("Logs from your program will appear here!");
 
-    // Uncomment this block to pass the first stage
+      String responseOK = "HTTP/1.1 200 OK \r\n\r\n";
+      String responseNOTFOUND = "HTTP/1.1 404 NOT FOUND \r\n\r\n";
 
-    ServerSocket serverSocket = null;
-    Socket clientSocket = null;
+      ServerSocket serverSocket = null;
+      Socket clientSocket = null;
 
-    try {
-        serverSocket = new ServerSocket(4221);
-        serverSocket.setReuseAddress(true);
-        clientSocket = serverSocket.accept(); // Wait for connection from client.
-        OutputStream streamOut = clientSocket.getOutputStream();
-        InputStream streamIn = clientSocket.getInputStream();
-        String input = new String(streamIn.readAllBytes());
-        String[] inputLines = input.split(" ");
+      try {
+          serverSocket = new ServerSocket(4221);
+          serverSocket.setReuseAddress(true);
+          clientSocket = serverSocket.accept(); // Wait for connection from client.
+          OutputStream streamOut = clientSocket.getOutputStream();
+          InputStream streamIn = clientSocket.getInputStream();
 
-        String responseOK = "HTTP/1.1 200 OK \r\n\r\n";
-        String responseNOTFOUND = "HTTP/1.1 404 NOT FOUND \r\n\r\n";
+          String input = new String(streamIn.readAllBytes());
+          String[] inputLines = input.split(" ");
 
-        streamOut.write(
-                (inputLines[1].equals("/") ?
-                        responseOK.getBytes() :
-                        responseNOTFOUND.getBytes()));
+          if (inputLines[1].equals("/")) {
+              streamOut.write(responseOK.getBytes());
+          } else {
+              streamOut.write(responseNOTFOUND.getBytes());
+          }
 
-        System.out.println("accepted new connection");
-    } catch (IOException e) {
-      System.out.println("IOException: " + e.getMessage());
-    }
+          System.out.println("accepted new connection");
+      } catch (IOException e) {
+        System.out.println("IOException: " + e.getMessage());
+      }
   }
 }
