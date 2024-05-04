@@ -1,7 +1,4 @@
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -12,7 +9,7 @@ public class Main {
       System.out.println("Logs from your program will appear here!");
 
       String responseOK = "HTTP/1.1 200 OK \r\n\r\n";
-      String responseNOTFOUND = "HTTP/1.1 404 NOT FOUND \r\n\r\n";
+      String responseNOTFOUND = "HTTP/1.1 404 Not Found \r\n\r\n";
 
       ServerSocket serverSocket = null;
       Socket clientSocket = null;
@@ -22,16 +19,17 @@ public class Main {
           serverSocket.setReuseAddress(true);
           clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-          InputStream streamIn = clientSocket.getInputStream();
-          String input = new String(streamIn.readAllBytes());
+          BufferedReader bufferIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+          OutputStream streamOut = clientSocket.getOutputStream();
+
+          String input = new String(bufferIn.readLine());
           String[] inputLines = input.split(" ");
 
-          OutputStream streamOut = clientSocket.getOutputStream();
-          if (inputLines[1].equals("/")) {
-              streamOut.write(responseOK.getBytes());
-          } else {
-              streamOut.write(responseNOTFOUND.getBytes());
-          }
+          streamOut.write((inputLines[1].equals("/")) ?
+                  responseOK.getBytes() :
+                  responseNOTFOUND.getBytes());
+
+          clientSocket.close();
 
           System.out.println("accepted new connection");
       } catch (IOException e) {
