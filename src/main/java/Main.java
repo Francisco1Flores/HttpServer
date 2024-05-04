@@ -21,12 +21,12 @@ public class Main {
           serverSocket = new ServerSocket(4221);
           serverSocket.setReuseAddress(true);
           clientSocket = serverSocket.accept(); // Wait for connection from client.
-          OutputStream streamOut = clientSocket.getOutputStream();
-          InputStream streamIn = clientSocket.getInputStream();
 
+          InputStream streamIn = clientSocket.getInputStream();
           String input = new String(streamIn.readAllBytes());
           String[] inputLines = input.split(" ");
 
+          OutputStream streamOut = clientSocket.getOutputStream();
           if (inputLines[1].equals("/")) {
               streamOut.write(responseOK.getBytes());
           } else {
