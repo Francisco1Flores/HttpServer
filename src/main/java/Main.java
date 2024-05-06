@@ -30,7 +30,7 @@ public class Main {
 
           List<Field> header = new ArrayList<>();
           header.add(new Field("Content-Type:", "text/plain"));
-          header.add(new Field("Content-Length:", String.valueOf(path.length())));
+          header.add(new Field("Content-Length:", String.valueOf(path.length() - 1)));
 
           HttpResponse response = new HttpResponse(HttpStatusCode.OK, header, path);
 
