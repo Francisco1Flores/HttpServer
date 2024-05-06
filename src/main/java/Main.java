@@ -27,7 +27,6 @@ public class Main {
 
           String[] splittedFirstLine = firstLine.split(" ");
           String path = splittedFirstLine[1];
-          String[] splittedPath = path.split("/");
 
           HttpResponse response;
 
@@ -35,21 +34,24 @@ public class Main {
               response = new HttpResponse(HttpStatusCode.OK);
               streamOut.write(response.getBytes());
               clientSocket.close();
-          }else if (splittedPath[0].equals("echo")) {
+          }else {
+              String[] splittedPath = path.split("/");
 
-              String body = splittedPath[splittedPath.length -1];
-              List<Field> header = new ArrayList<>();
-              header.add(new Field("Content-Type:", "text/plain"));
-              header.add(new Field("Content-Length:", String.valueOf(body.length())));
+              if (splittedPath[1].equals("echo")) {
+                  String body = splittedPath[splittedPath.length - 1];
+                  List<Field> header = new ArrayList<>();
+                  header.add(new Field("Content-Type:", "text/plain"));
+                  header.add(new Field("Content-Length:", String.valueOf(body.length())));
 
-              response = new HttpResponse(HttpStatusCode.OK, header, body);
+                  response = new HttpResponse(HttpStatusCode.OK, header, body);
 
-              streamOut.write(response.getBytes());
-              clientSocket.close();
-          } else {
-              response = new HttpResponse(HttpStatusCode.NOT_FOUND);
-              streamOut.write(response.getBytes());
-              clientSocket.close();
+                  streamOut.write(response.getBytes());
+                  clientSocket.close();
+              } else {
+                  response = new HttpResponse(HttpStatusCode.NOT_FOUND);
+                  streamOut.write(response.getBytes());
+                  clientSocket.close();
+              }
           }
 
           System.out.println("accepted new connection");
