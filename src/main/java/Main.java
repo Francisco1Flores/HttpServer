@@ -22,12 +22,19 @@ public class Main {
           BufferedReader bufferIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
           OutputStream streamOut = clientSocket.getOutputStream();
 
-          String input = new String(bufferIn.readLine());
-          String[] inputLines = input.split(" ");
+          String firstLine = bufferIn.readLine();
+          System.out.println(firstLine);
 
-          streamOut.write((inputLines[1].equals("/")) ?
-                  responseOK.getBytes() :
-                  responseNOTFOUND.getBytes());
+          String[] splittedFirstLine = firstLine.split(" ");
+          String path = splittedFirstLine[1];
+
+          List<Field> header = new ArrayList<>();
+          header.add(new Field("Content-Type:", "text/plain"));
+          header.add(new Field("Content-Length:", String.valueOf(path.length())));
+
+          HttpResponse response = new HttpResponse(HttpStatusCode.OK, header, path);
+
+          streamOut.write(response.getBytes());
 
           clientSocket.close();
 
