@@ -19,7 +19,7 @@ public class HttpResponse {
 
         completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n" + this.body;
     }
-    
+
     public byte[] getBytes() {
         return completeResponse.getBytes();
     }

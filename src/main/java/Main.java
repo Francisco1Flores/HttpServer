@@ -26,7 +26,7 @@ public class Main {
           System.out.println(firstLine);
 
           String[] splittedFirstLine = firstLine.split(" ");
-          String path = splittedFirstLine[1];
+          String path = parsePath(splittedFirstLine[1]);
 
           List<Field> header = new ArrayList<>();
           header.add(new Field("Content-Type:", "text/plain"));
@@ -42,5 +42,10 @@ public class Main {
       } catch (IOException e) {
         System.out.println("IOException: " + e.getMessage());
       }
+  }
+
+  public static String parsePath(String path) {
+      String[] splittedPath = path.split("/");
+      return "/" + splittedPath[splittedPath.length - 1];
   }
 }
