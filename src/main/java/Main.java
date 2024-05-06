@@ -26,17 +26,31 @@ public class Main {
           System.out.println(firstLine);
 
           String[] splittedFirstLine = firstLine.split(" ");
-          String path = parsePath(splittedFirstLine[1]);
+          String path = splittedFirstLine[1];
+          String[] splittedPath = path.split("/");
 
-          List<Field> header = new ArrayList<>();
-          header.add(new Field("Content-Type:", "text/plain"));
-          header.add(new Field("Content-Length:", String.valueOf(path.length())));
+          HttpResponse response;
 
-          HttpResponse response = new HttpResponse(HttpStatusCode.OK, header, path);
+          if (path.equals("/")) {
+              response = new HttpResponse(HttpStatusCode.OK);
+              streamOut.write(response.getBytes());
+              clientSocket.close();
+          }else if (splittedPath[0].equals("echo")) {
 
-          streamOut.write(response.getBytes());
+              String body = splittedPath[splittedPath.length -1];
+              List<Field> header = new ArrayList<>();
+              header.add(new Field("Content-Type:", "text/plain"));
+              header.add(new Field("Content-Length:", String.valueOf(body.length())));
 
-          clientSocket.close();
+              response = new HttpResponse(HttpStatusCode.OK, header, body);
+
+              streamOut.write(response.getBytes());
+              clientSocket.close();
+          } else {
+              response = new HttpResponse(HttpStatusCode.NOT_FOUND);
+              streamOut.write(response.getBytes());
+              clientSocket.close();
+          }
 
           System.out.println("accepted new connection");
       } catch (IOException e) {

@@ -2,13 +2,11 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpResponse {
-    HttpStatusCode statusCode;
-    List<Field> header;
-
-    String stringHeader;
-    String body;
-
-    String completeResponse;
+    private HttpStatusCode statusCode;
+    private List<Field> header;
+    private String stringHeader;
+    private String body;
+    private String completeResponse;
 
     public HttpResponse(HttpStatusCode statusCode, List<Field> header, String body) {
         this.statusCode = statusCode;
@@ -18,6 +16,12 @@ public class HttpResponse {
         stringHeader = headerToString();
 
         completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n" + this.body;
+    }
+
+    public HttpResponse(HttpStatusCode statusCode) {
+        this.statusCode = statusCode;
+
+        completeResponse = this.statusCode.message + "\r\n\r\n";
     }
 
     public byte[] getBytes() {
