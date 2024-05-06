@@ -30,7 +30,7 @@ public class Main {
 
           List<Field> header = new ArrayList<>();
           header.add(new Field("Content-Type:", "text/plain"));
-          header.add(new Field("Content-Length:", String.valueOf(path.length() - 1)));
+          header.add(new Field("Content-Length:", String.valueOf(path.length())));
 
           HttpResponse response = new HttpResponse(HttpStatusCode.OK, header, path);
 
@@ -46,6 +46,6 @@ public class Main {
 
   public static String parsePath(String path) {
       String[] splittedPath = path.split("/");
-      return "/" + splittedPath[splittedPath.length - 1];
+      return splittedPath[splittedPath.length - 1];
   }
 }
