@@ -8,9 +8,6 @@ public class Main {
     // You can use print statements as follows for debugging, they'll be visible when running tests
       System.out.println("Logs from your program will appear here!");
 
-      String responseOK = "HTTP/1.1 200 OK \r\n\r\n";
-      String responseNOTFOUND = "HTTP/1.1 404 Not Found \r\n\r\n";
-
       ServerSocket serverSocket = null;
       Socket clientSocket = null;
 
@@ -19,23 +16,31 @@ public class Main {
           serverSocket.setReuseAddress(true);
           clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-          BufferedReader bufferIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+          HttpRequestParser request = new HttpRequestParser(clientSocket.getInputStream());
           OutputStream streamOut = clientSocket.getOutputStream();
-
-          String firstLine = bufferIn.readLine();
-          System.out.println(firstLine);
-
-          String[] splittedFirstLine = firstLine.split(" ");
-          String path = splittedFirstLine[1];
 
           HttpResponse response;
 
-          if (path.equals("/")) {
+          if (request.getPath().equals("/")) {
               response = new HttpResponse(HttpStatusCode.OK);
               streamOut.write(response.getBytes());
               clientSocket.close();
-          }else {
-              String[] splittedPath = path.split("/");
+
+          }else if (request.getPath().equals("/user-agent")) {
+
+              String body = request.getHeaderValue("User-Agent");
+              List<Field> header = new ArrayList<>();
+              header.add(new Field("Content-Type:", "text/plain"));
+              header.add(new Field("Content-Length:", String.valueOf(body.length())));
+
+              response = new HttpResponse(HttpStatusCode.OK, header, body);
+
+              streamOut.write(response.getBytes());
+              clientSocket.close();
+
+          } else {
+              String[] splittedPath = request.getPath().split("/");
 
               if (splittedPath[1].equals("echo")) {
                   String body = splittedPath[splittedPath.length - 1];
@@ -57,11 +62,8 @@ public class Main {
           System.out.println("accepted new connection");
       } catch (IOException e) {
         System.out.println("IOException: " + e.getMessage());
+      } catch (BadRequestException bre) {
+          System.out.println(bre.getMessage());
       }
-  }
-
-  public static String parsePath(String path) {
-      String[] splittedPath = path.split("/");
-      return splittedPath[splittedPath.length - 1];
   }
 }
