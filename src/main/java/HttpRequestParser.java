@@ -36,8 +36,6 @@ public class HttpRequestParser {
             header.put(key,value);
             System.out.println( key + ": " + value);
         }
-        inputStream.close();
-
     }
 
     private float extractHttpVersion(String firstLine) throws BadRequestException {
