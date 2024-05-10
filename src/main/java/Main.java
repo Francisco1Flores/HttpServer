@@ -14,56 +14,17 @@ public class Main {
       try {
           serverSocket = new ServerSocket(4221);
           serverSocket.setReuseAddress(true);
-          clientSocket = serverSocket.accept(); // Wait for connection from client.
-
-
-          HttpRequestParser request = new HttpRequestParser(clientSocket.getInputStream());
-          OutputStream streamOut = clientSocket.getOutputStream();
-
-          HttpResponse response;
-
-          if (request.getPath().equals("/")) {
-              response = new HttpResponse(HttpStatusCode.OK);
-              streamOut.write(response.getBytes());
-              clientSocket.close();
-
-          }else if (request.getPath().equals("/user-agent")) {
-
-              String body = request.getHeaderValue("User-Agent");
-              List<Field> header = new ArrayList<>();
-              header.add(new Field("Content-Type:", "text/plain"));
-              header.add(new Field("Content-Length:", String.valueOf(body.length())));
-
-              response = new HttpResponse(HttpStatusCode.OK, header, body);
-
-              streamOut.write(response.getBytes());
-              clientSocket.close();
-
-          } else {
-              String[] splittedPath = request.getPath().split("/");
-
-              if (splittedPath[1].equals("echo")) {
-                  String body = splittedPath[splittedPath.length - 1];
-                  List<Field> header = new ArrayList<>();
-                  header.add(new Field("Content-Type:", "text/plain"));
-                  header.add(new Field("Content-Length:", String.valueOf(body.length())));
-
-                  response = new HttpResponse(HttpStatusCode.OK, header, body);
-
-                  streamOut.write(response.getBytes());
-                  clientSocket.close();
-              } else {
-                  response = new HttpResponse(HttpStatusCode.NOT_FOUND);
-                  streamOut.write(response.getBytes());
-                  clientSocket.close();
-              }
+          System.out.println("[SERVER]: server started");
+          while (true) {
+              System.out.println("[SERVER]: waiting for connection");
+              clientSocket = serverSocket.accept();
+              System.out.println("[SERVER]: accepted new connection");
+              HttpRequestHandler httpHandler = new HttpRequestHandler(clientSocket);
+              Thread handlerThread = new Thread(httpHandler);
+              handlerThread.start();
           }
-
-          System.out.println("accepted new connection");
-      } catch (IOException e) {
-        System.out.println("IOException: " + e.getMessage());
-      } catch (BadRequestException bre) {
-          System.out.println(bre.getMessage());
+          } catch(IOException e) {
+          System.out.println("IOException: " + e.getMessage());
       }
   }
 }
