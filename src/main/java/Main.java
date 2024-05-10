@@ -19,7 +19,7 @@ public class Main {
               System.out.println("[SERVER]: waiting for connection");
               clientSocket = serverSocket.accept();
               System.out.println("[SERVER]: accepted new connection");
-              HttpRequestHandler httpHandler = new HttpRequestHandler(clientSocket);
+              Runnable httpHandler = new HttpRequestHandler(clientSocket);
               Thread handlerThread = new Thread(httpHandler);
               handlerThread.start();
           }
