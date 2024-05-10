@@ -3,7 +3,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+
+
 public class Main {
+
+    public static ArrayList<Thread> clients = new ArrayList<>();
+
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests
       System.out.println("Logs from your program will appear here!");
@@ -20,8 +25,9 @@ public class Main {
               clientSocket = serverSocket.accept();
               System.out.println("[SERVER]: accepted new connection");
               Runnable httpHandler = new HttpRequestHandler(clientSocket);
-              Thread handlerThread = new Thread(httpHandler);
-              handlerThread.start();
+              Thread clientThread = new Thread(httpHandler);
+              clients.add(clientThread);
+              clientThread.start();
           }
           } catch(IOException e) {
           System.out.println("IOException: " + e.getMessage());
