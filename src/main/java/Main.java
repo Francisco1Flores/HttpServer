@@ -8,10 +8,6 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-
-    //public static ArrayList<Thread> clients = new ArrayList<>();
-    //public static ExecutorService pool = Executors.newFixedThreadPool(5);
-
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests
       System.out.println("Logs from your program will appear here!");

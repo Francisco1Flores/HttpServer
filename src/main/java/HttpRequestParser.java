@@ -29,12 +29,15 @@ public class HttpRequestParser {
         path = extractPath(firstLine);
         httpVersion = extractHttpVersion(firstLine);
         System.out.println("\nheader:\n");
-        for (String headerLine = bufferIn.readLine(); !headerLine.isEmpty(); headerLine = bufferIn.readLine()) {
-            String key = headerLine.substring(0,headerLine.indexOf(':'));
-            String value = headerLine.substring(headerLine.indexOf(':') + 2);
+        if (path.equals("/user-agent")) {
+            String headerLine;
+            while (!(headerLine = bufferIn.readLine()).isBlank()) {
+                String key = headerLine.substring(0, headerLine.indexOf(':'));
+                String value = headerLine.substring(headerLine.indexOf(':') + 2);
 
-            header.put(key,value);
-            System.out.println( key + ": " + value);
+                header.put(key, value);
+                System.out.println(key + ": " + value);
+            }
         }
     }
 
@@ -43,8 +46,8 @@ public class HttpRequestParser {
         if (splittedFirstLIne.length != 3)
             throw new BadRequestException();
 
-        String version = splittedFirstLIne[2].substring(5); // 5 is the index of the string "HTTP/1.1" where
-                                                                      // version number starts
+        String version = splittedFirstLIne[2].substring(5,7); // 5 is the index of the string "HTTP/1.1" where
+                                                              // version number starts
         return Float.parseFloat(version);
     }
 

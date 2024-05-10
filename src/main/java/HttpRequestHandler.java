@@ -16,16 +16,12 @@ public class HttpRequestHandler implements Runnable {
         this.client = client;
         streamIn = client.getInputStream();
         streamOut = client.getOutputStream();
-
-        try {
-            request = new HttpRequestParser(streamIn);
-        } catch (BadRequestException e) {
-            response = new HttpResponse(HttpStatusCode.NOT_FOUND);
-        }
     }
     @Override
     public void run() {
         try {
+            request = new HttpRequestParser(streamIn);
+
             if (request.getPath().equals("/")) {
                 response = new HttpResponse(HttpStatusCode.OK);
                 streamOut.write(response.getBytes());
@@ -34,7 +30,7 @@ public class HttpRequestHandler implements Runnable {
             } else if (request.getPath().equals("/user-agent")) {
                 String body = request.getHeaderValue("User-Agent");
                 List<Field> header = new ArrayList<>();
-                header.add(new Field("Content-Type:", "text/html"));
+                header.add(new Field("Content-Type:", "text/plain"));
                 header.add(new Field("Content-Length:", String.valueOf(body.length())));
 
                 response = new HttpResponse(HttpStatusCode.OK, header, body);
@@ -63,6 +59,15 @@ public class HttpRequestHandler implements Runnable {
             }
         } catch (IOException e) {
             System.out.println("[ERROR]: " + e.getMessage());
+        } catch (BadRequestException e) {
+            System.out.println("[ERROR]: bad request");
+        } finally {
+            if (client != null)
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    System.out.println("[ERROR]: " + e.getMessage());
+                }
         }
     }
 }
