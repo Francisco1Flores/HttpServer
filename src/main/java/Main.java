@@ -9,8 +9,8 @@ import java.util.concurrent.Executors;
 
 public class Main {
 
-    public static ArrayList<Thread> clients = new ArrayList<>();
-    public static ExecutorService pool = Executors.newFixedThreadPool(5);
+    //public static ArrayList<Thread> clients = new ArrayList<>();
+    //public static ExecutorService pool = Executors.newFixedThreadPool(5);
 
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests
@@ -27,7 +27,9 @@ public class Main {
               System.out.println("[SERVER]: waiting for connection ...");
               clientSocket = serverSocket.accept();
               System.out.println("[SERVER]: accepted new connection");
-              pool.execute(new HttpRequestHandler(clientSocket));
+              HttpRequestHandler requestHandler = new HttpRequestHandler(clientSocket);
+              Thread clientThread = new Thread(requestHandler);
+              clientThread.start();
           }
           } catch(IOException e) {
           System.out.println("IOException: " + e.getMessage());
