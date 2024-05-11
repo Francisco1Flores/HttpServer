@@ -29,7 +29,7 @@ public class HttpRequestParser {
         path = extractPath(firstLine);
         httpVersion = extractHttpVersion(firstLine);
 
-        if (path.equals("/user-agent")) {
+        if (path.equals("/user-agent") || method.equals("POST")) {
             String headerLine;
             while (!(headerLine = bufferIn.readLine()).isBlank()) {
                 String key = headerLine.substring(0, headerLine.indexOf(':'));
