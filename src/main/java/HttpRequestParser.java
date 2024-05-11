@@ -38,6 +38,12 @@ public class HttpRequestParser {
                 header.put(key, value);
             }
         }
+        if (method.equals("POST")) {
+            int bodySize = Integer.parseInt(header.get("Content-Length"));
+            char[] charBuff = new char[bodySize];
+            bufferIn.read(charBuff);
+            body = new String(charBuff);
+        }
     }
 
     private float extractHttpVersion(String firstLine) throws BadRequestException {
@@ -83,5 +89,7 @@ public class HttpRequestParser {
         return header.get(key);
     }
 
-
+    public String getBody() {
+        return body;
+    }
 }
