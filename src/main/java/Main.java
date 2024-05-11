@@ -8,27 +8,30 @@ import java.util.concurrent.Executors;
 
 
 public class Main {
-  public static void main(String[] args) {
-    // You can use print statements as follows for debugging, they'll be visible when running tests
-      System.out.println("Logs from your program will appear here!");
 
-      ServerSocket serverSocket = null;
-      Socket clientSocket = null;
+    public static String folderPath;
+    public static void main(String[] args) {
 
-      try {
-          serverSocket = new ServerSocket(4221);
-          serverSocket.setReuseAddress(true);
-          System.out.println("[SERVER]: server started");
-          while (true) {
+        if (args.length >= 1)
+            folderPath = args[1].endsWith("/") ? args[1] : args[1] + "/";
+
+        ServerSocket serverSocket = null;
+        Socket clientSocket = null;
+
+        try {
+            serverSocket = new ServerSocket(4221);
+            serverSocket.setReuseAddress(true);
+            System.out.println("[SERVER]: server started");
+            while (true) {
               System.out.println("[SERVER]: waiting for connection ...");
               clientSocket = serverSocket.accept();
               System.out.println("[SERVER]: accepted new connection");
-              HttpRequestHandler requestHandler = new HttpRequestHandler(clientSocket);
+              HttpRequestHandler requestHandler = new HttpRequestHandler(clientSocket, folderPath);
               Thread clientThread = new Thread(requestHandler);
               clientThread.start();
-          }
-          } catch(IOException e) {
-          System.out.println("IOException: " + e.getMessage());
-      }
-  }
+            }
+        } catch(IOException e) {
+            System.out.println("IOException: " + e.getMessage());
+        }
+    }
 }

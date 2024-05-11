@@ -18,7 +18,7 @@ public class HttpRequestParser {
             throw new IOException();
 
         BufferedReader bufferIn = new BufferedReader(new InputStreamReader(inputStream));
-         String firstLine = bufferIn.readLine();
+        String firstLine = bufferIn.readLine();
 
         if (firstLine == null)
             throw new IOException();
@@ -28,7 +28,7 @@ public class HttpRequestParser {
         method = extractMethod(firstLine);
         path = extractPath(firstLine);
         httpVersion = extractHttpVersion(firstLine);
-        System.out.println("\nheader:\n");
+
         if (path.equals("/user-agent")) {
             String headerLine;
             while (!(headerLine = bufferIn.readLine()).isBlank()) {
@@ -36,7 +36,6 @@ public class HttpRequestParser {
                 String value = headerLine.substring(headerLine.indexOf(':') + 2);
 
                 header.put(key, value);
-                System.out.println(key + ": " + value);
             }
         }
     }
