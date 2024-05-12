@@ -18,6 +18,15 @@ public class HttpResponse {
         completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n" + this.body;
     }
 
+    public HttpResponse(HttpStatusCode statusCode, List<Field> header) {
+        this.statusCode = statusCode;
+        this.header = header;
+
+        stringHeader = headerToString();
+
+        completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n";
+    }
+
     public HttpResponse(HttpStatusCode statusCode) {
         this.statusCode = statusCode;
 

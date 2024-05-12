@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class HttpRequestHandler implements Runnable {
     private Socket client;
@@ -46,28 +47,44 @@ public class HttpRequestHandler implements Runnable {
 
                     String body = splittedPath[splittedPath.length - 1];
                     List<Field> header = new ArrayList<>();
+
                     header.add(new Field("Content-Type", "text/plain"));
                     header.add(new Field("Content-Length", String.valueOf(body.length())));
+
                     if (request.headerKeyExist("accept-encoding")) {
                         if (request.getHeaderValue("accept-encoding").equals("gzip")) {
+
                             header.add(new Field("Content-Encoding", "gzip"));
+                            response = new HttpResponse(HttpStatusCode.OK, header);
+                            GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
+                            streamOut.write(response.getBytes());
+                            gzip.write(body.getBytes());
+                            gzip.finish();
+                            client.close();
+
                         } else if (request.getHeaderValue("accept-encoding").contains(", ")) {
                             String[] compressionFormats = request.getHeaderValue("accept-encoding").split(", ");
                             for (String compressionFormat : compressionFormats) {
                                 if (compressionFormat.equals("gzip")) {
+
                                     header.add(new Field("Content-Encoding", compressionFormat));
+                                    header.add(new Field("Content-Encoding", "gzip"));
+                                    response = new HttpResponse(HttpStatusCode.OK, header);
+                                    GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
+                                    streamOut.write(response.getBytes());
+                                    gzip.write(body.getBytes());
+                                    gzip.finish();
+                                    client.close();
                                     break;
                                 }
                             }
                         }
+                    } else {
+                        response = new HttpResponse(HttpStatusCode.OK, header, body);
+
+                        streamOut.write(response.getBytes());
+                        client.close();
                     }
-
-                    response = new HttpResponse(HttpStatusCode.OK, header, body);
-
-                    streamOut.write(response.getBytes());
-                    client.close();
-
-                    //}
                 } else if (request.getPath().startsWith("/files")) {
 
                     String filePath = fileDirectory + request.getPath().split("/")[2];
