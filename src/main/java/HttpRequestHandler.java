@@ -51,7 +51,7 @@ public class HttpRequestHandler implements Runnable {
                     header.add(new Field("Content-Length:", String.valueOf(body.length())));
                     if (request.headerKeyExist("accept-encoding")) {
                         if (!request.getHeaderValue("accept-encoding").equals("invalid-encoding"))
-                            header.add(new Field("Content-Encoding", request.getHeaderValue("accept-encoding")));
+                            header.add(new Field("Content-Encoding:", request.getHeaderValue("accept-encoding")));
                     }
 
                     response = new HttpResponse(HttpStatusCode.OK, header, body);
