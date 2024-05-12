@@ -39,7 +39,7 @@ public class HttpRequestParser {
             }
         }
         if (method.equals("POST")) {
-            int bodySize = Integer.parseInt(header.get("Content-Length"));
+            int bodySize = Integer.parseInt(header.get("content-length"));
             char[] charBuff = new char[bodySize];
             bufferIn.read(charBuff);
             body = new String(charBuff);
