@@ -56,8 +56,8 @@ public class HttpRequestHandler implements Runnable {
 
                             header.add(new Field("Content-Encoding", "gzip"));
                             response = new HttpResponse(HttpStatusCode.OK, header);
-                            GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
                             streamOut.write(response.getBytes());
+                            GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
                             gzip.write(body.getBytes());
                             gzip.finish();
                             client.close();
@@ -70,8 +70,8 @@ public class HttpRequestHandler implements Runnable {
                                     header.add(new Field("Content-Encoding", compressionFormat));
                                     header.add(new Field("Content-Encoding", "gzip"));
                                     response = new HttpResponse(HttpStatusCode.OK, header);
-                                    GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
                                     streamOut.write(response.getBytes());
+                                    GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
                                     gzip.write(body.getBytes());
                                     gzip.finish();
                                     client.close();
