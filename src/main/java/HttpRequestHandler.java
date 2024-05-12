@@ -31,7 +31,7 @@ public class HttpRequestHandler implements Runnable {
                     client.close();
 
                 } else if (request.getPath().equals("/user-agent")) {
-                    String body = request.getHeaderValue("User-Agent");
+                    String body = request.getHeaderValue("user-agent");
                     List<Field> header = new ArrayList<>();
                     header.add(new Field("Content-Type:", "text/plain"));
                     header.add(new Field("Content-Length:", String.valueOf(body.length())));
@@ -49,6 +49,10 @@ public class HttpRequestHandler implements Runnable {
                     List<Field> header = new ArrayList<>();
                     header.add(new Field("Content-Type:", "text/plain"));
                     header.add(new Field("Content-Length:", String.valueOf(body.length())));
+                    if (request.headerKeyExist("accept-encoding")) {
+                        if (!request.getHeaderValue("accept-encoding").equals("invalid-encoding"))
+                            header.add(new Field("Content-Encoding", request.getHeaderValue("accept-encoding")));
+                    }
 
                     response = new HttpResponse(HttpStatusCode.OK, header, body);
 
