@@ -33,8 +33,8 @@ public class HttpRequestHandler implements Runnable {
                 } else if (request.getPath().equals("/user-agent")) {
                     String body = request.getHeaderValue("user-agent");
                     List<Field> header = new ArrayList<>();
-                    header.add(new Field("Content-Type:", "text/plain"));
-                    header.add(new Field("Content-Length:", String.valueOf(body.length())));
+                    header.add(new Field("Content-Type", "text/plain"));
+                    header.add(new Field("Content-Length", String.valueOf(body.length())));
 
                     response = new HttpResponse(HttpStatusCode.OK, header, body);
 
@@ -44,14 +44,22 @@ public class HttpRequestHandler implements Runnable {
                 } else if (request.getPath().startsWith("/echo")) {
                     String[] splittedPath = request.getPath().split("/");
 
-                    //if (splittedPath[1].equals("echo")) {
                     String body = splittedPath[splittedPath.length - 1];
                     List<Field> header = new ArrayList<>();
-                    header.add(new Field("Content-Type:", "text/plain"));
-                    header.add(new Field("Content-Length:", String.valueOf(body.length())));
+                    header.add(new Field("Content-Type", "text/plain"));
+                    header.add(new Field("Content-Length", String.valueOf(body.length())));
                     if (request.headerKeyExist("accept-encoding")) {
-                        if (!request.getHeaderValue("accept-encoding").equals("invalid-encoding"))
-                            header.add(new Field("Content-Encoding:", request.getHeaderValue("accept-encoding")));
+                        if (request.getHeaderValue("accept-encoding").equals("gzip")) {
+                            header.add(new Field("Content-Encoding", "gzip"));
+                        } else if (request.getHeaderValue("accept-encoding").contains(", ")) {
+                            String[] compressionFormats = request.getHeaderValue("accept-encoding").split(", ");
+                            for (String compressionFormat : compressionFormats) {
+                                if (compressionFormat.equals("gzip")) {
+                                    header.add(new Field("Content-Encoding", compressionFormat));
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     response = new HttpResponse(HttpStatusCode.OK, header, body);
@@ -70,8 +78,8 @@ public class HttpRequestHandler implements Runnable {
                         try {
                             fileContent = new String(Files.readAllBytes(Paths.get(filePath)));
                             List<Field> header = new ArrayList<>();
-                            header.add(new Field("Content-Type:", "application/octet-stream"));
-                            header.add(new Field("Content-Length:", String.valueOf(fileContent.length())));
+                            header.add(new Field("Content-Type", "application/octet-stream"));
+                            header.add(new Field("Content-Length", String.valueOf(fileContent.length())));
 
                             response = new HttpResponse(HttpStatusCode.OK, header, fileContent);
                             streamOut.write(response.getBytes());

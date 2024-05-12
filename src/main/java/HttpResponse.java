@@ -35,7 +35,7 @@ public class HttpResponse {
     private String headerToString() {
         StringBuilder sh = new StringBuilder();
         for (Field field : header) {
-            sh.append(field.getKey() + " " + field.getValue() + "\r\n");
+            sh.append(field.getKey() + ": " + field.getValue() + "\r\n");
         }
         return sh.toString();
     }
