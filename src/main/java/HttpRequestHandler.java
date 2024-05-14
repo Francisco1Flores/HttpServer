@@ -49,37 +49,36 @@ public class HttpRequestHandler implements Runnable {
                     List<Field> header = new ArrayList<>();
 
                     header.add(new Field("Content-Type", "text/plain"));
-                    header.add(new Field("Content-Length", String.valueOf(body.length())));
 
                     if (request.headerKeyExist("accept-encoding")) {
-                        if (request.getHeaderValue("accept-encoding").equals("gzip")) {
+                        if (request.getHeaderValue("accept-encoding").contains("gzip")) {
 
-                            header.add(new Field("Content-Encoding", "gzip"));
-                            response = new HttpResponse(HttpStatusCode.OK, header);
-                            streamOut.write(response.getBytes());
-                            GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
+                            ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+                            GZIPOutputStream gzip = new GZIPOutputStream(arrayOutputStream);
                             gzip.write(body.getBytes());
-                            gzip.finish();
+                            gzip.close();
+
+                            header.add(new Field("Content-Length", String.valueOf(arrayOutputStream.toByteArray().length)));
+                            header.add(new Field("Content-Encoding", "gzip"));
+
+                            response = new HttpResponse(HttpStatusCode.OK, header);
+
+                            streamOut.write(response.getBytes());
+                            streamOut.write(arrayOutputStream.toByteArray());
+
                             client.close();
+                        } else {
+                            header.add(new Field("Content-Length", String.valueOf(body.length())));
 
-                        } else if (request.getHeaderValue("accept-encoding").contains(", ")) {
-                            String[] compressionFormats = request.getHeaderValue("accept-encoding").split(", ");
-                            for (String compressionFormat : compressionFormats) {
-                                if (compressionFormat.equals("gzip")) {
+                            response = new HttpResponse(HttpStatusCode.OK, header, body);
 
-                                    header.add(new Field("Content-Encoding", compressionFormat));
-                                    header.add(new Field("Content-Encoding", "gzip"));
-                                    response = new HttpResponse(HttpStatusCode.OK, header);
-                                    streamOut.write(response.getBytes());
-                                    GZIPOutputStream gzip = new GZIPOutputStream(streamOut);
-                                    gzip.write(body.getBytes());
-                                    gzip.finish();
-                                    client.close();
-                                    break;
-                                }
-                            }
+                            streamOut.write(response.getBytes());
+                            client.close();
                         }
+
                     } else {
+                        header.add(new Field("Content-Length", String.valueOf(body.length())));
+
                         response = new HttpResponse(HttpStatusCode.OK, header, body);
 
                         streamOut.write(response.getBytes());
