@@ -126,7 +126,7 @@ public class HttpRequestHandler implements Runnable {
 
 
         } catch (IOException e) {
-            System.out.println("[ERROR]: " + e.getMessage());
+            System.out.println("[ERROR2]: " + e.getMessage());
         } catch (BadRequestException e) {
             System.out.println("[ERROR]: bad request");
         } finally {
@@ -134,7 +134,7 @@ public class HttpRequestHandler implements Runnable {
                 try {
                     client.close();
                 } catch (IOException e) {
-                    System.out.println("[ERROR]: " + e.getMessage());
+                    System.out.println("[ERROR1]: " + e.getMessage());
                 }
             }
         }
