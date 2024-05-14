@@ -30,6 +30,7 @@ public class HttpRequestHandler implements Runnable {
                     response = new HttpResponse(HttpStatusCode.OK);
                     streamOut.write(response.getBytes());
                     client.close();
+                    System.out.println("[SERVER]: connection closed");
 
                 } else if (request.getPath().equals("/user-agent")) {
                     String body = request.getHeaderValue("user-agent");
@@ -41,6 +42,7 @@ public class HttpRequestHandler implements Runnable {
 
                     streamOut.write(response.getBytes());
                     client.close();
+                    System.out.println("[SERVER]: connection closed");
 
                 } else if (request.getPath().startsWith("/echo")) {
                     String[] splittedPath = request.getPath().split("/");
@@ -67,6 +69,7 @@ public class HttpRequestHandler implements Runnable {
                             streamOut.write(arrayOutputStream.toByteArray());
 
                             client.close();
+                            System.out.println("[SERVER]: connection closed");
                         } else {
                             header.add(new Field("Content-Length", String.valueOf(body.length())));
 
@@ -74,6 +77,7 @@ public class HttpRequestHandler implements Runnable {
 
                             streamOut.write(response.getBytes());
                             client.close();
+                            System.out.println("[SERVER]: connection closed");
                         }
 
                     } else {
@@ -83,6 +87,7 @@ public class HttpRequestHandler implements Runnable {
 
                         streamOut.write(response.getBytes());
                         client.close();
+                        System.out.println("[SERVER]: connection closed");
                     }
                 } else if (request.getPath().startsWith("/files")) {
 
@@ -100,6 +105,7 @@ public class HttpRequestHandler implements Runnable {
                             response = new HttpResponse(HttpStatusCode.OK, header, fileContent);
                             streamOut.write(response.getBytes());
                             client.close();
+                            System.out.println("[SERVER]: connection closed");
 
                         } catch (IOException e) {
                             System.out.println("[ERROR]: an error occurred trying to accessing to a file");
@@ -108,11 +114,13 @@ public class HttpRequestHandler implements Runnable {
                         response = new HttpResponse(HttpStatusCode.NOT_FOUND);
                         streamOut.write(response.getBytes());
                         client.close();
+                        System.out.println("[SERVER]: connection closed");
                     }
                 } else {
                     response = new HttpResponse(HttpStatusCode.NOT_FOUND);
                     streamOut.write(response.getBytes());
                     client.close();
+                    System.out.println("[SERVER]: connection closed");
                 }
             } else {
                 String filePath = fileDirectory + request.getPath().split("/")[2];
@@ -122,19 +130,21 @@ public class HttpRequestHandler implements Runnable {
                 response = new HttpResponse(HttpStatusCode.CREATED);
                 streamOut.write(response.getBytes());
                 client.close();
+                System.out.println("[SERVER]: connection closed");
             }
 
 
         } catch (IOException e) {
-            System.out.println("[ERROR2]: " + e.getMessage());
+            System.out.println("[SERVER]: connection closed");
         } catch (BadRequestException e) {
             System.out.println("[ERROR]: bad request");
         } finally {
             if (client != null) {
                 try {
                     client.close();
+                    System.out.println("[SERVER]: connection closed");
                 } catch (IOException e) {
-                    System.out.println("[ERROR1]: " + e.getMessage());
+                    System.out.println("[ERROR]: " + e.getMessage());
                 }
             }
         }

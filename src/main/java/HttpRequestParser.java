@@ -14,7 +14,7 @@ public class HttpRequestParser {
     private String body;
     public HttpRequestParser(InputStream inputStream) throws IOException, BadRequestException {
         if (inputStream == null)
-            throw new IOException();
+            throw new IOException("error whit input stream");
 
         BufferedReader bufferIn = new BufferedReader(new InputStreamReader(inputStream));
         String firstLine = bufferIn.readLine();
