@@ -6,7 +6,13 @@ public class HttpResponse {
     private List<Field> header;
     private String stringHeader;
     private String body;
+
+    private byte[] gzipCompressedBody;
+
+    private boolean bodyIsCompressed = false;
     private String completeResponse;
+
+    private byte[] compressedResponse;
 
     public HttpResponse(HttpStatusCode statusCode, List<Field> header, String body) {
         this.statusCode = statusCode;
@@ -16,6 +22,23 @@ public class HttpResponse {
         stringHeader = headerToString();
 
         completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n" + this.body;
+    }
+
+    public HttpResponse(HttpStatusCode statusCode, List<Field> header, byte[] body) {
+        this.statusCode = statusCode;
+        this.header = header;
+        gzipCompressedBody = body;
+
+        stringHeader = headerToString();
+
+        completeResponse = this.statusCode.message + "\r\n" + stringHeader + "\r\n";
+
+        compressedResponse = new byte[completeResponse.getBytes().length + gzipCompressedBody.length];
+
+        System.arraycopy(completeResponse.getBytes(),0, compressedResponse,0,completeResponse.getBytes().length);
+        System.arraycopy(gzipCompressedBody,0,compressedResponse,completeResponse.getBytes().length, compressedResponse.length);
+
+        bodyIsCompressed = true;
     }
 
     public HttpResponse(HttpStatusCode statusCode, List<Field> header) {
@@ -34,11 +57,11 @@ public class HttpResponse {
     }
 
     public byte[] getBytes() {
-        return completeResponse.getBytes();
+        return (bodyIsCompressed) ? compressedResponse : completeResponse.getBytes();
     }
 
     public String getString() {
-        return completeResponse;
+        return (bodyIsCompressed) ? (completeResponse +  gzipCompressedBody.toString()) : completeResponse;
     }
 
     private String headerToString() {

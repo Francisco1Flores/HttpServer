@@ -63,10 +63,9 @@ public class HttpRequestHandler implements Runnable {
                             header.add(new Field("Content-Length", String.valueOf(arrayOutputStream.toByteArray().length)));
                             header.add(new Field("Content-Encoding", "gzip"));
 
-                            response = new HttpResponse(HttpStatusCode.OK, header);
+                            response = new HttpResponse(HttpStatusCode.OK, header, arrayOutputStream.toByteArray());
 
                             streamOut.write(response.getBytes());
-                            streamOut.write(arrayOutputStream.toByteArray());
 
                             client.close();
                             System.out.println("[SERVER]: connection closed");
