@@ -36,7 +36,7 @@ public class HttpResponse {
         compressedResponse = new byte[completeResponse.getBytes().length + gzipCompressedBody.length];
 
         System.arraycopy(completeResponse.getBytes(),0, compressedResponse,0,completeResponse.getBytes().length);
-        System.arraycopy(gzipCompressedBody,0,compressedResponse,completeResponse.getBytes().length, compressedResponse.length);
+        System.arraycopy(gzipCompressedBody,0,compressedResponse,completeResponse.getBytes().length - 1, compressedResponse.length);
 
         bodyIsCompressed = true;
     }
