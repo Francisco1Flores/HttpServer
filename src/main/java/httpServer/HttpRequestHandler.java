@@ -1,30 +1,49 @@
+package httpServer;
+
+import httpServer.exeption.BadRequestException;
+import httpServer.get.HttpGetRequestHandler;
+import httpServer.httpResponse.HttpResponse;
+import httpServer.post.HttpPostRequestHandler;
+
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 public class HttpRequestHandler implements Runnable {
-    private Socket client;
-    private OutputStream streamOut;
-    private InputStream streamIn;
-    private HttpRequestParser request;
-    private HttpResponse response;
-    private String fileDirectory;
+    private final Socket client;
+    private final OutputStream streamOut;
+    private final InputStream streamIn;
 
-    public HttpRequestHandler(Socket client, String fileDirectory) throws IOException {
+    public HttpRequestHandler(Socket client) throws IOException {
         this.client = client;
         streamIn = client.getInputStream();
         streamOut = client.getOutputStream();
-        if (fileDirectory != null)
-            this.fileDirectory = fileDirectory;
     }
+
     @Override
     public void run() {
         try {
-            request = new HttpRequestParser(streamIn);
+            HttpRequestParser requestParser = new HttpRequestParser(streamIn);
+            HttpRequest httpRequest = requestParser.parse();
+            httpRequest.print();
+
+            RequestHandler requestHandler = getPertinentHandler(httpRequest);
+            HttpResponse response = requestHandler.processRequest();
+            System.out.println(response.toString());
+            streamOut.write(response.getBytes());
+
+            try {
+                client.close();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println("[SERVER]: connection closed");
+        } catch (BadRequestException e){
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+/*
             if (request.getMethod().equals("GET")) {
                 if (request.getPath().equals("/")) {
                     response = new HttpResponse(HttpStatusCode.OK);
@@ -131,8 +150,6 @@ public class HttpRequestHandler implements Runnable {
                 client.close();
                 System.out.println("[SERVER]: connection closed");
             }
-
-
         } catch (IOException e) {
             System.out.println("[SERVER]: connection closed");
         } catch (BadRequestException e) {
@@ -146,6 +163,20 @@ public class HttpRequestHandler implements Runnable {
                     System.out.println("[ERROR]: " + e.getMessage());
                 }
             }
-        }
+            */
+
+
     }
+
+    public RequestHandler getPertinentHandler(HttpRequest request) {
+       return switch (request.method()) {
+           case GET -> new HttpGetRequestHandler(request);
+           case POST -> new HttpPostRequestHandler(request);
+           case UPDATE -> null;
+           case DELETE -> null;
+           case PATCH -> null;
+           case NOT_SUPORTED -> null;
+       };
+    }
+
 }

@@ -1,3 +1,5 @@
+package httpServer;
+
 public enum HttpStatusCode {
     OK("HTTP/1.1 200 OK"),
     CREATED("HTTP/1.1 201 Created"),
