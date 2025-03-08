@@ -20,13 +20,11 @@ public class Main {
             serverSocket.setReuseAddress(true);
             Logger.server("server started");
             while (true) {
-                System.out.println("[SERVER]: waiting for connection ...");
                 Logger.server("waiting for connection ...");
                 clientSocket = serverSocket.accept();
                 Logger.server("accepted new connection");
                 HttpRequestHandler requestHandler = new HttpRequestHandler(clientSocket);
-                Thread clientThread = new Thread(requestHandler);
-                clientThread.start();
+                Thread.startVirtualThread(requestHandler);
             }
         } catch(IOException e) {
             Logger.info(e.getMessage());
